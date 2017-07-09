@@ -1,8 +1,5 @@
-var Ownable = artifacts.require("./Ownable.sol");
-var Plan = artifacts.require("./Plan.sol");
+var Friendzone = artifacts.require("./Friendzone.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(Ownable);
-  deployer.link(Ownable, Plan);
-  deployer.deploy(Plan);
+  deployer.deploy(Friendzone);
 };

@@ -4,7 +4,7 @@ pragma solidity ^0.4.11;
 /*
  * An initiative is something a group of people casts a vote on.
  * It can be not-yet-opened, in progress and ended
- * An initiative has: 
+ * An initiative has:
  *  - An admin.
  *  - A group of members (including the admin).
  *  - A description of the initiative.
@@ -58,14 +58,13 @@ contract Initiative {
     }
 
     function Initiative(
-        address _admin,
         address[] _members,
         uint _votesNeededToPass,
         bytes32 _description
     ) {
         require(_votesNeededToPass > 0);
 
-        admin = _admin;
+        admin = msg.sender;
         votesNeededToPass = _votesNeededToPass;
         description = _description;
         for (uint i = 0; i < _members.length; i++) {
@@ -108,57 +107,43 @@ contract Initiative {
 
 contract Plan {
     address public owner;
-    bytes32 name;
-    address[] members;
+    bytes32 public name;
+    address[] public members;
+
     Initiative[] initiatives;
 
-    event OnAddInitiative(Initiative initiative);
-    event OnAddNewMember(address newMember);
+    event OnAddInitiative(address initiative);
+    event OnAddNewMember(bytes32 planName, address newMember);
 
     modifier onlyOwner() {
         require(owner == msg.sender);
         _;
     }
 
-    function Plan(address _owner, bytes32 _name, address[] _members) {
-        require(owner > 0x0);
-        owner = _owner;
+    function Plan(bytes32 _name, address[] _members) {
+        owner = msg.sender;
         name = _name;
         members = _members;
     }
 
     function addMember(address newMember) onlyOwner {
-        require(newMember > 0x0);
+        // add member
         members.push(newMember);
-        OnAddNewMember(newMember);
+        // communicate that a new member has been added to the plan
+        OnAddNewMember(name, newMember);
     }
 
-    function addInitiative(bytes32 description, uint256 votesNeededToPass) {
-        require(description.length >= 0);
-        // we need members
-        require(members.length >= 0);
-
+    function addInitiative(uint256 votesNeededToPass, bytes32 description) returns (Initiative newInitiativeAddress) {
         Initiative newInitiative = new Initiative(members, votesNeededToPass, description);
         initiatives.push(newInitiative);
-        OnAddInitiative(newInitiative);
+        OnAddInitiative(address(newInitiative));
+        return newInitiative;
     }
-
-    // TODO: Figure out how to retrieve open initiatives
-    // function openInitiatives() constant returns (Initiative[] pendingInitiatives) {
-    //   for (uint i = 0; i < initiatives.length; i++) {
-    //     if (initiatives[i].isOpen()) {
-    //       pendingInitiatives.push(initiatives[i]);
-    //     }
-    //   }
-    //   return pendingInitiatives;
-    // }
 }
 
 
 contract Friendzone {
-    Plan[] plans;
-
-    function addNewPlan(bytes32 _name, address[] _members) {
-        plans.push(new Plan(_name, _members));
+    function createNewPlan(bytes32 name, address[] members) returns (Plan planAddress) {
+        return new Plan(name, members);
     }
 }
