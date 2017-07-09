@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "fsevents": "^1.1.2",
+    "zeppelin-solidity": "^1.1.0"
+  }
+}

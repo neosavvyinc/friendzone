@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "truffle-expect": "^0.0.3"
+  }
+}
