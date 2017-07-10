@@ -49,9 +49,11 @@ contract('Plan', function(accounts) {
   it('should transfer the ownership to another address', function() {
     Plan.new('My Plan', [accounts[0], accounts[1]])
       .then(instance => {
-        instance.allEvents().watch(function(error, event) {
+        const events = instance.allEvents()
+        events.watch(function(error, event) {
           assert.equal(event.event, 'OwnershipTransferred');
           assert.equal(event.args.newOwner, accounts[1]);
+          events.stopWatching();
         })
         return instance.transfer(accounts[1]);
       });
@@ -110,9 +112,11 @@ contract('Plan', function(accounts) {
   it('should emit a new initiative added event with the address of the new initiative', function() {
     Plan.new('My Plan', [accounts[0], accounts[1]])
       .then(instance => {
-        instance.allEvents().watch(function(error, event) {
+        const events = instance.allEvents()
+        events.watch(function(error, event) {
           assert.equal(event.event, 'NewInitiativeAdded');
           assert.isAddress(event.args.initiative);
+          events.stopWatching();
         })
         return instance.addInitiative(
           3,

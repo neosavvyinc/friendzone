@@ -20,11 +20,6 @@ contract Plan {
         _;
     }
 
-    function checkIfMember(address member) returns (bool) {
-        require(membersMap[member]);
-        return membersMap[member];
-    }
-
     function Plan(bytes32 _name, address[] _members) {
         owner = msg.sender;
         name = _name;
@@ -33,6 +28,11 @@ contract Plan {
         for (uint i = 0; i < members.length; i++) {
             membersMap[members[i]] = true;
         }
+    }
+
+    function transfer(address _newOwner) onlyOwner {
+        owner = _newOwner;
+        OwnershipTransferred(owner);
     }
 
     function addMember(address newMember) onlyOwner {
@@ -49,16 +49,17 @@ contract Plan {
         return newInitiative;
     }
 
-    function getMemberAtIndex(uint idx) returns (address) {
+    function checkIfMember(address member) constant returns (bool) {
+        require(membersMap[member]);
+        return membersMap[member];
+    }
+
+    function getMemberAtIndex(uint idx) constant returns (address) {
         return members[idx];
     }
 
-    function getInitiativesLength() returns (uint) {
+    // TODO: Do I need this?
+    function getInitiativesLength() constant returns (uint) {
         return initiatives.length;
-    }
-
-    function transfer(address _newOwner) onlyOwner {
-        owner = _newOwner;
-        OwnershipTransferred(owner);
     }
 }

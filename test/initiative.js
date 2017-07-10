@@ -64,7 +64,7 @@ contract('Initiative', function(accounts) {
       });
   });
 
-  // TODO: BEWARE
+  // TODO: BEWARE if these tests are enabled the test build will fail
   //it('should pass the initiative if there are more votes than the ones needed', function() {
   //  Initiative.new([accounts[0], accounts[1]], 1, 'My Initiative', 'Cool plan description')
   //    .then(instance => {
@@ -85,10 +85,12 @@ contract('Initiative', function(accounts) {
   //    .then(instance => {
   //      return instance.openVoting()
   //        .then(() => {
-  //          instance.allEvents().watch(function(error, event) {
+  //          const events = instance.allEvents()
+  //          events.watch(function(error, event) {
   //            assert.equal(event.event, 'NewVoteCasted');
   //            assert.equal(event.args.voter, accounts[0]);
   //            assert.equal(event.args.value, true);
+  //            events.stopWatching();
   //          })
   //          return instance.vote(true);
   //        });

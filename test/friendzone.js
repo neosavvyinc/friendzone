@@ -26,9 +26,12 @@ contract('Friendzone', function(accounts) {
   it('should emit that a new plan has been created', function() {
     return Friendzone.deployed()
       .then((instance) => {
-        instance.allEvents().watch(function(error, event) {
+        const events = instance.allEvents();
+        events.watch(function(error, event) {
           assert.equal(event.event, 'NewPlanCreated');
           assert.isAddress(event.args.planAddress);
+          // .stopWatching() is needed to stop testprc from hanging at eth_getFiltersChanges
+          events.stopWatching();
         });
 
         return instance.createNewPlan('My new plan', [accounts[0], accounts[1], accounts[2]]);

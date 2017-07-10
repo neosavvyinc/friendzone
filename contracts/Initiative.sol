@@ -109,20 +109,20 @@ contract Initiative {
         description = _description;
     }
 
-    function addMember(address _member) onlyAdmin {
+    function addMember(address _member) onlyAdmin constant {
         require(!isMember(_member));
         members[_member] = true;
     }
 
-    function isMember(address member) onlyMember returns (bool) {
+    function isMember(address member) onlyMember constant returns (bool) {
         return members[member];
     }
 
-    function voterValue(address member) onlyMember returns (bool) {
+    function voterValue(address member) onlyMember constant returns (bool) {
         return votes[member];
     }
 
-    function getPositiveVotes() onlyMember returns (uint) {
+    function getPositiveVotes() onlyMember constant returns (uint) {
         return positiveVotes;
     }
 }
