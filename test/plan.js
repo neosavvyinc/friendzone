@@ -1,7 +1,6 @@
 const Plan = artifacts.require("Plan");
 
 contract('Plan', function(accounts) {
-
   it('should set the owner as the sender when constructed', function() {
     Plan.new('My Plan', [accounts[0], accounts[1]])
       .then(instance => {

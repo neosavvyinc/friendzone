@@ -29,7 +29,8 @@ contract Initiative {
     bool public result;
 
     event CommunicateResult(bool result);
-    event OnOpenInitiative(bytes32 description);
+    event InitiativeHasBeenOpened(address initiative, bytes32 name, bytes32 description);
+    event NewVoteCasted(address voter, bool value);
 
     modifier onlyAdmin() {
         require(admin == msg.sender);
@@ -37,7 +38,7 @@ contract Initiative {
     }
 
     // check if sender is a member
-    modifier isMember() {
+    modifier onlyMember() {
         require(members[msg.sender]);
         _;
     }
@@ -49,7 +50,7 @@ contract Initiative {
     }
 
     modifier isVotingClosed() {
-        require(isOpen);
+        require(!isOpen);
         _;
     }
 
@@ -76,7 +77,7 @@ contract Initiative {
         isOpen = false;
     }
 
-    function vote(bool value) onlyIfNotVoted {
+    function vote(bool value) onlyIfNotVoted isVotingOpen {
         votes[msg.sender] = value;
 
         if (value) {
@@ -86,6 +87,8 @@ contract Initiative {
         if (!result && positiveVotes >= votesNeededToPass) {
             result = true;
         }
+
+        NewVoteCasted(msg.sender, value);
     }
 
     function closeVoting() onlyAdmin isVotingOpen {
@@ -95,14 +98,31 @@ contract Initiative {
 
     function openVoting() onlyAdmin isVotingClosed {
         isOpen = true;
-        OnOpenInitiative(description);
+        InitiativeHasBeenOpened(this, name, description);
+    }
+
+    function changeName(bytes32 _name) onlyAdmin {
+        name = _name;
     }
 
     function changeDescription(bytes32 _description) onlyAdmin {
         description = _description;
     }
 
-    function onAddMember(address _member) onlyAdmin {
+    function addMember(address _member) onlyAdmin {
+        require(!isMember(_member));
         members[_member] = true;
+    }
+
+    function isMember(address member) onlyMember returns (bool) {
+        return members[member];
+    }
+
+    function voterValue(address member) onlyMember returns (bool) {
+        return votes[member];
+    }
+
+    function getPositiveVotes() onlyMember returns (uint) {
+        return positiveVotes;
     }
 }
