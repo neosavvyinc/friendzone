@@ -21,7 +21,7 @@ contract Plan {
     }
 
     function Plan(bytes32 _name, address[] _members) {
-        owner = msg.sender;
+        owner = tx.origin;
         name = _name;
         members = _members;
 
@@ -38,6 +38,10 @@ contract Plan {
     function addMember(address newMember) onlyOwner {
         // add member
         members.push(newMember);
+        membersMap[newMember] = true;
+        for (uint i = 0; i < initiatives.length; i++) {
+            initiatives[i].addMember(newMember);
+        }
         // communicate that a new member has been added to the plan
         NewMemberAdded(name, newMember);
     }

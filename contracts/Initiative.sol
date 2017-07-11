@@ -32,7 +32,7 @@ contract Initiative {
     event InitiativeHasBeenOpened(address initiative, bytes32 name, bytes32 description);
     event NewVoteCasted(address voter, bool value);
 
-    modifier onlyAdmin() {
+    modifier onlyPlanOwner() {
         require(admin == msg.sender);
         _;
     }
@@ -91,25 +91,25 @@ contract Initiative {
         NewVoteCasted(msg.sender, value);
     }
 
-    function closeVoting() onlyAdmin isVotingOpen {
+    function closeVoting() onlyPlanOwner isVotingOpen {
         isOpen = false;
         CommunicateResult(result);
     }
 
-    function openVoting() onlyAdmin isVotingClosed {
+    function openVoting() onlyPlanOwner isVotingClosed {
         isOpen = true;
         InitiativeHasBeenOpened(this, name, description);
     }
 
-    function changeName(bytes32 _name) onlyAdmin {
+    function changeName(bytes32 _name) onlyPlanOwner {
         name = _name;
     }
 
-    function changeDescription(bytes32 _description) onlyAdmin {
+    function changeDescription(bytes32 _description) onlyPlanOwner {
         description = _description;
     }
 
-    function addMember(address _member) onlyAdmin constant {
+    function addMember(address _member) onlyPlanOwner constant {
         require(!isMember(_member));
         members[_member] = true;
     }
