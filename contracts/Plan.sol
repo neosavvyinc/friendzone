@@ -30,12 +30,13 @@ contract Plan {
         }
     }
 
-    function transfer(address _newOwner) onlyOwner {
+    function transfer(address _newOwner) onlyOwner returns (bool) {
         owner = _newOwner;
         OwnershipTransferred(owner);
+        return true;
     }
 
-    function addMember(address newMember) onlyOwner {
+    function addMember(address newMember) onlyOwner returns (bool) {
         // add member
         members.push(newMember);
         membersMap[newMember] = true;
@@ -44,6 +45,7 @@ contract Plan {
         }
         // communicate that a new member has been added to the plan
         NewMemberAdded(name, newMember);
+        return true;
     }
 
     function addInitiative(uint256 votesNeededToPass, bytes32 name, bytes32 description) returns (Initiative newInitiativeAddress) {
