@@ -37,12 +37,18 @@ contract Plan {
     }
 
     function addMember(address newMember) onlyOwner returns (bool) {
+        // check if newMember is already a member
+        require(checkIfMember(newMember));
+
         // add member
         members.push(newMember);
         membersMap[newMember] = true;
+
+        // add member to all initiatives of this plan
         for (uint i = 0; i < initiatives.length; i++) {
             initiatives[i].addMember(newMember);
         }
+
         // communicate that a new member has been added to the plan
         NewMemberAdded(name, newMember);
         return true;
@@ -58,14 +64,5 @@ contract Plan {
     function checkIfMember(address member) constant returns (bool) {
         require(membersMap[member]);
         return membersMap[member];
-    }
-
-    function getMemberAtIndex(uint idx) constant returns (address) {
-        return members[idx];
-    }
-
-    // TODO: Do I need this?
-    function getInitiativesLength() constant returns (uint) {
-        return initiatives.length;
     }
 }
