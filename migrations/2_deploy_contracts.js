@@ -1,5 +1,5 @@
-var Friendzone = artifacts.require("./Friendzone.sol");
+var Plan = artifacts.require("./Plan.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(Friendzone);
+  deployer.deploy(Plan);
 };

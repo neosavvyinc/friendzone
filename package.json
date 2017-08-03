@@ -1,6 +1,18 @@
 {
-  "dependencies": {
-    "fsevents": "^1.1.2",
-    "zeppelin-solidity": "^1.1.0"
+  "name": "friendzone",
+  "version": "1.0.0",
+  "main": "truffle.js",
+  "license": "MIT",
+  "scripts": {
+    "truffle": "truffle",
+    "console": "truffle console",
+    "test": "truffle test",
+    "coverage": "./node_modules/.bin/solidity-coverage"
+  },
+  "devDependencies": {
+    "debug": "^2.6.8",
+    "ethereumjs-testrpc": "^4.0.1",
+    "solidity-coverage": "^0.2.0",
+    "truffle": "^3.4.6"
   }
 }

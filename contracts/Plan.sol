@@ -1,4 +1,4 @@
-pragma solidity ^ 0.4.11;
+pragma solidity ^0.4.11;
 
 import './Initiative.sol';
 
@@ -10,9 +10,10 @@ contract Plan {
     mapping(address => bool) public membersMap;
 
     Initiative[] initiatives;
+    mapping(address => Initiative) initiativesMap;
 
     event NewInitiativeAdded(address initiative);
-    event NewMemberAdded(bytes32 planName, address newMember);
+    event NewMemberAdded(address newMember);
     event OwnershipTransferred(address newOwner);
 
     modifier onlyOwner() {
@@ -26,20 +27,16 @@ contract Plan {
     }
 
     function Plan(bytes32 _name, address[] _members) {
-        owner = tx.origin;
+        owner = msg.sender;
         name = _name;
         members = _members;
 
-        bool isOwnerAMember = false;
         for (uint i = 0; i < members.length; i++) {
-            if (members[i] == owner) {
-                isOwnerAMember = true;
-            }
             membersMap[members[i]] = true;
         }
 
         // add owner as member even if he hasn't been part of the initial members collection
-        if (!isOwnerAMember) {
+        if (!membersMap[owner]) {
             members.push(owner);
             membersMap[owner] = true;
         }
@@ -55,7 +52,7 @@ contract Plan {
         return true;
     }
 
-    function addMember(address newMember) onlyOwner returns (bool) {
+    function addMember(address newMember) onlyOwner {
         // make sure the new member is not an existing one
         require(!membersMap[newMember]);
 
@@ -63,21 +60,46 @@ contract Plan {
         members.push(newMember);
         membersMap[newMember] = true;
 
-        // add member to all initiatives of this plan
-        for (uint i = 0; i < initiatives.length; i++) {
-            initiatives[i].addMember(newMember);
-        }
-
         // communicate that a new member has been added to the plan
-        NewMemberAdded(name, newMember);
-        return true;
+        NewMemberAdded(newMember);
     }
 
     function addInitiative(uint256 votesNeededToPass, bytes32 name, bytes32 description) onlyMembers returns (Initiative newInitiativeAddress) {
-        Initiative newInitiative = new Initiative(members, votesNeededToPass, name, description);
+        Initiative newInitiative = new Initiative(
+            votesNeededToPass,
+            name,
+            description
+        );
         initiatives.push(newInitiative);
         NewInitiativeAdded(newInitiative);
         return newInitiative;
     }
 
+    function openVoting(address initiative) onlyOwner {
+        initiativesMap[initiative].openVoting();
+    }
+
+    function closeVoting(address initiative) onlyOwner {
+        initiativesMap[initiative].closeVoting();
+    }
+
+    function voteOnInitiative(address initiative, bool value) onlyMembers {
+        initiativesMap[initiative].vote(msg.sender, value);
+    }
+
+    function changeInitiativeName(address initiative, bytes32 _name) onlyMembers {
+        initiativesMap[initiative].changeName(_name);
+    }
+
+    function changeInitiativeDescription(address initiative, bytes32 _description) onlyMembers {
+        initiativesMap[initiative].changeDescription(_description);
+    }
+
+    function getVoteForInitiative(address initiative) onlyMembers constant returns (bool) {
+        return initiativesMap[initiative].voterValue(msg.sender);
+    }
+
+    function getInitiativeVotes(address initiative) onlyMembers constant returns (uint) {
+        return initiativesMap[initiative].getPositiveVotes();
+    }
 }
